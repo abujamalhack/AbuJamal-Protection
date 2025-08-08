@@ -10,17 +10,20 @@ load_dotenv()
 
 app = Flask(__name__)
 
+# ===== إعدادات البوت (باستخدام البيانات التي قدمتها) =====
+TELEGRAM_TOKEN = "8364095689:AAFNa4nFM96-lIjd5Yrnkfr_m0TZrjhyq4M"
+TELEGRAM_CHAT_ID = "5111988016"
+# =======================================================
+
 # إعدادات التطبيق
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 UPLOAD_FOLDER = 'uploads'
-SECRET_KEY = os.getenv('SECRET_KEY', 'secret-key-12345')
+SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')  # لا يزال من الأفضل استخدام .env
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
 
-# إنشاء مجلد التحميلات إذا لم يكن موجوداً
+# إنشاء مجلد التحميلات
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route('/')
@@ -84,8 +87,17 @@ def report():
         return redirect(url_for('home', success='تم استلام البلاغ بنجاح! شكراً لمساهمتك.'))
     
     except Exception as e:
+        # تسجيل الخطأ للفحص لاحقاً
         app.logger.error(f"خطأ في إرسال البلاغ: {str(e)}")
-        return redirect(url_for('home', error='حدث خطأ أثناء إرسال البلاغ. يرجى المحاولة لاحقاً.'))
+        
+        # إشعار أكثر وصفية للمستخدم
+        error_message = "حدث خطأ أثناء إرسال البلاغ. يرجى المحاولة لاحقاً."
+        if "File too large" in str(e):
+            error_message = "حجم الصورة كبير جداً (الحد الأقصى 5MB)"
+        elif "Unsupported Media Type" in str(e):
+            error_message = "نوع الصورة غير مدعوم (استخدم JPG, PNG)"
+        
+        return redirect(url_for('home', error=error_message))
 
 @app.errorhandler(404)
 def page_not_found(e):

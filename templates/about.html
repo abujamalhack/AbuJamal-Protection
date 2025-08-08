@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حول النظام - أبو جمال عبد الناصر</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF5722;
+            --secondary: #9C27B0;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --gray: #1e1e1e;
+            --light: #e0e0e0;
+            --lighter: #f5f5f5;
+            --gold: #D4AF37;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'El Messiri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--lighter);
+            min-height: 100vh;
+            background-attachment: fixed;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.03"><text x="50%" y="50%" font-size="20" text-anchor="middle" fill="white">ℹ</text></svg>');
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 20px;
+            padding: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(to right, var(--gold), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        
+        .header p {
+            font-size: 1.3rem;
+            color: var(--light);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .mission-section {
+            background: rgba(40, 40, 40, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border-left: 4px solid var(--gold);
+        }
+        
+        .mission-section h2 {
+            color: var(--gold);
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .mission-section p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--light);
+        }
+        
+        .features-list {
+            margin: 40px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(35, 35, 35, 0.6);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+            background: rgba(45, 45, 45, 0.8);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .feature-icon {
+            min-width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid var(--gold);
+        }
+        
+        .feature-content h3 {
+            font-size: 1.6rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        
+        .feature-content p {
+            font-size: 1.1rem;
+            color: var(--light);
+            line-height: 1.7;
+        }
+        
+        .founder-section {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin: 50px 0;
+            padding: 30px;
+            background: rgba(40, 40, 40, 0.6);
+            border-radius: 15px;
+            border-top: 3px solid var(--gold);
+        }
+        
+        .founder-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: 4px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            flex-shrink: 0;
+        }
+        
+        .founder-info h2 {
+            font-size: 2.2rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+        
+        .founder-info p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--light);
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+        }
+        
+        @media (max-width: 900px) {
+            .founder-section {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .feature-item {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>حول النظام</h1>
+            <p>نظام متكامل للتبليغ عن التهديدات الإلكترونية والمحتوى المسيء</p>
+        </div>
+        
+        <a href="/" class="back-btn">
+            <i class="fas fa-arrow-right"></i> العودة للصفحة الرئيسية
+        </a>
+        
+        <div class="mission-section">
+            <h2><i class="fas fa-bullseye"></i> مهمتنا</h2>
+            <p>
+                مهمتنا هي توفير بيئة إلكترونية آمنة للجميع. نؤمن بأن الإنترنت يجب أن يكون مكاناً للتواصل الإيجابي 
+                وتبادل المعرفة دون خوف من التهديدات أو المحتوى المسيء. نسعى جاهدين لتقديم حلول فعالة وسريعة 
+                للتعامل مع أي شكل من أشكال الإساءة الإلكترونية، مع الحفاظ على سرية وسلامة المستخدمين.
+            </p>
+        </div>
+        
+        <div class="mission-section">
+            <h2><i class="fas fa-eye"></i> رؤيتنا</h2>
+            <p>
+                نطمح لأن نكون المنصة الرائدة في مجال مكافحة التهديدات الإلكترونية في المنطقة. نسعى لبناء مجتمع 
+                إلكتروني واعٍ ومثقف قادر على التعامل مع التحديات الرقمية بثقة وأمان. نعمل على تطوير أدوات وتقنيات 
+                متقدمة تواكب التطورات في عالم الجرائم الإلكترونية وتوفر الحماية اللازمة للأفراد والمؤسسات.
+            </p>
+        </div>
+        
+        <div class="features-list">
+            <h2 style="color: var(--gold); font-size: 2rem; margin-bottom: 20px; text-align: center;">
+                <i class="fas fa-star"></i> مميزات النظام
+            </h2>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="feature-content">
+                    <h3>حماية شاملة</h3>
+                    <p>
+                        يوفر النظام حماية شاملة من جميع أشكال التهديدات الإلكترونية، بما في ذلك الابتزاز، 
+                        التنمر، انتحال الشخصية، والمحتوى المسيء. نحن نضمن أقصى درجات الحماية لبياناتك الشخصية.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="feature-content">
+                    <h3>استجابة فورية</h3>
+                    <p>
+                        فريقنا يعمل على مدار الساعة لاستقبال البلاغات واتخاذ الإجراءات الفورية. نضمن معالجة 
+                        البلاغات في غضون 24 ساعة، مع توفير متابعة مستمرة لحالة البلاغ حتى حله النهائي.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="feature-content">
+                    <h3>سرية تامة</h3>
+                    <p>
+                        نضمن سرية تامة للمبلغين، حيث يتم التعامل مع جميع البيانات بمنتهى السرية والأمان. 
+                        لا يتم مشاركة أي معلومات شخصية مع أطراف ثالثة دون موافقة صريحة من المستخدم.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fab fa-telegram"></i>
+                </div>
+                <div class="feature-content">
+                    <h3>تكامل مع تيليجرام</h3>
+                    <p>
+                        يتكامل النظام مع تطبيق تيليجرام لإرسال إشعارات فورية للفريق المسؤول. 
+                        يضمن هذا التكامل المتابعة الفورية للبلاغات واتخاذ الإجراءات اللازمة في أسرع وقت.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="founder-section">
+            <div class="founder-image">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="founder-info">
+                <h2>أبو جمال عبد الناصر</h2>
+                <p>
+                    مؤسس النظام وخبير الأمن الإلكتروني. يتمتع بخبرة تزيد عن 10 سنوات في مجال 
+                    مكافحة الجرائم الإلكترونية وحماية البيانات. حاصل على شهادات متقدمة في أمن المعلومات 
+                    من مؤسسات عالمية مرموقة. يهدف من خلال هذا النظام إلى حماية المجتمع من المخاطر 
+                    الرقمية وتوعية المستخدمين بأساليب الحماية الحديثة.
+                </p>
+                <p>
+                    "نسعى لإنترنت آمن للجميع، حيث يمكن للأفراد التعبير عن آرائهم بحرية ودون خوف."
+                </p>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="/" class="back-btn">
+                <i class="fas fa-home"></i> العودة للصفحة الرئيسية
+            </a>
+        </div>
+    </div>
+</body>
+                  </html>

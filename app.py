@@ -1,107 +1,114 @@
 import os
 import requests
 from datetime import datetime
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, redirect, url_for, send_from_directory, render_template
 from werkzeug.utils import secure_filename
-from dotenv import load_dotenv
+from config import config
 
-# تحميل المتغيرات البيئية
-load_dotenv()
+# إنشاء التطبيق
+app = Flask(__name__, template_folder='templates')
 
-app = Flask(__name__)
+# تحميل الإعدادات
+config_name = os.getenv('FLASK_ENV', 'development')
+app.config.from_object(config[config_name])
 
-# ===== إعدادات البوت (باستخدام البيانات التي قدمتها) =====
-TELEGRAM_TOKEN = "8364095689:AAFNa4nFM96-lIjd5Yrnkfr_m0TZrjhyq4M"
-TELEGRAM_CHAT_ID = "5111988016"
-# =======================================================
-
-# إعدادات التطبيق
-UPLOAD_FOLDER = 'uploads'
-SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')  # لا يزال من الأفضل استخدام .env
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SECRET_KEY'] = SECRET_KEY
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
+# التحقق من صحة الإعدادات
+config[config_name].validate_config()
 
 # إنشاء مجلد التحميلات
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+# الصفحة الرئيسية
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
+# صفحة التبليغ
+@app.route('/report')
+def report_page():
+    return render_template('report.html')
 
-@app.route('/terms')
-def terms():
-    return render_template('terms.html')
-
-@app.route('/report', methods=['POST'])
-def report():
-    # استقبال البيانات من النموذج
+# استقبال البلاغات
+@app.route('/submit_report', methods=['POST'])
+def submit_report():
     name = request.form.get('name', '')
     email = request.form.get('email', '')
     report_type = request.form.get('type', '')
     details = request.form.get('details', '')
     image = request.files.get('image')
-    
-    # التحقق من وجود صورة
+
     if not image or image.filename == '':
         return redirect(url_for('home', error='لم تقم باختيار صورة!'))
-    
-    # حفظ الصورة
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff', 'webp'}
+    file_extension = image.filename.rsplit('.', 1)[-1].lower() if '.' in image.filename else ''
+
+    if file_extension not in allowed_extensions:
+        return redirect(url_for('home', error='نوع الملف غير مدعوم. يُسمح فقط بالصور'))
+
+    image.seek(0, 2)
+    file_size = image.tell()
+    image.seek(0)
+
+    if file_size > app.config['MAX_CONTENT_LENGTH']:
+        return redirect(url_for('home', error='حجم الصورة كبير جداً. الحد الأقصى 5MB'))
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = secure_filename(f"{timestamp}_{image.filename}")
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    image.save(filepath)
-    
-    # إعداد رسالة التليجرام
+
+    try:
+        image.save(filepath)
+    except Exception as e:
+        app.logger.error(f"خطأ في حفظ الملف: {str(e)}")
+        return redirect(url_for('home', error='حدث خطأ أثناء حفظ الصورة'))
+
     telegram_message = f"""
-🚨 **بلاغ جديد!** 🚨
-👤 **الاسم:** {name}
-📧 **الإيميل:** {email}
-⚠️ **نوع البلاغ:** {report_type}
-📝 **التفاصيل:** {details or 'لا توجد تفاصيل إضافية'}
-🕒 **الوقت:** {timestamp}
+🚨 بلاغ جديد! 🚨
+👤 الاسم: {name}
+📧 الإيميل: {email}
+⚠️ نوع البلاغ: {report_type}
+📝 التفاصيل: {details or 'لا توجد تفاصيل إضافية'}
+🕒 الوقت: {timestamp}
 """
-    
+
     try:
         # إرسال الرسالة النصية
-        text_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-        text_data = {
-            'chat_id': TELEGRAM_CHAT_ID,
-            'text': telegram_message,
-            'parse_mode': 'Markdown'
-        }
+        text_url = f"https://api.telegram.org/bot{app.config['TELEGRAM_TOKEN']}/sendMessage"
+        text_data = {'chat_id': app.config['TELEGRAM_CHAT_ID'], 'text': telegram_message, 'parse_mode': 'Markdown'}
         requests.post(text_url, json=text_data)
-        
+
         # إرسال الصورة
-        photo_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
+        photo_url = f"https://api.telegram.org/bot{app.config['TELEGRAM_TOKEN']}/sendPhoto"
         with open(filepath, 'rb') as photo:
             files = {'photo': photo}
-            data = {'chat_id': TELEGRAM_CHAT_ID}
+            data = {'chat_id': app.config['TELEGRAM_CHAT_ID']}
             requests.post(photo_url, files=files, data=data)
-        
-        return redirect(url_for('home', success='تم استلام البلاغ بنجاح! شكراً لمساهمتك.'))
-    
-    except Exception as e:
-        # تسجيل الخطأ للفحص لاحقاً
-        app.logger.error(f"خطأ في إرسال البلاغ: {str(e)}")
-        
-        # إشعار أكثر وصفية للمستخدم
-        error_message = "حدث خطأ أثناء إرسال البلاغ. يرجى المحاولة لاحقاً."
-        if "File too large" in str(e):
-            error_message = "حجم الصورة كبير جداً (الحد الأقصى 5MB)"
-        elif "Unsupported Media Type" in str(e):
-            error_message = "نوع الصورة غير مدعوم (استخدم JPG, PNG)"
-        
-        return redirect(url_for('home', error=error_message))
 
+        return redirect(url_for('home', success='تم استلام البلاغ بنجاح!'))
+
+    except Exception as e:
+        app.logger.error(f"خطأ في إرسال البلاغ: {str(e)}")
+        return redirect(url_for('home', error='حدث خطأ أثناء إرسال البلاغ. يرجى المحاولة لاحقاً.'))
+
+# خدمة الملفات الثابتة (CSS, JS)
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('templates', filename)
+
+# 404 مخصصة
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
 
+# منع الكاش
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=app.config['DEBUG'])
